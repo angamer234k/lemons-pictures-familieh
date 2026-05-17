@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GitHub Image Upload</title>
+    <style>
+        body { font-family: system-ui; max-width: 500px; margin: 2rem auto; padding: 1rem; }
+        input, button { width: 100%; padding: 0.5rem; margin: 0.5rem 0; }
+        button { background: #2563eb; color: white; border: none; border-radius: 0.25rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Upload to Private Repo</h1>
+    <form id="uploadForm">
+        <input type="file" id="imageFile" accept="image/*" required>
+        <button type="submit">Upload & View</button>
+    </form>
+    <div id="status"></div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = document.getElementById('imageFile').files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const status = document.getElementById('status');
+            status.innerText = 'Uploading...';
+
+            const res = await fetch('/api/upload', { method: 'POST', body: formData });
+            const data = await res.json();
+
+            if (res.ok) {
+                // Redirect to image.js with the filename
+                window.location.href = `/api/image?id=${encodeURIComponent(data.filename)}`;
+            } else {
+                status.innerText = `Error: ${data.error}`;
+            }
+        });
+    </script>
+</body>
+</html>
